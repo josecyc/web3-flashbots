@@ -41,12 +41,15 @@ class FlashbotProvider(HTTPProvider):
             text=Web3.keccak(text=request_data.decode("utf-8")).hex()
         )
         signed_message = Account.sign_message(
-            message, private_key=self.signature_account.privateKey.hex()
+            # message, private_key=self.signature_account.privateKey.hex()
+            message, private_key=self.signature_account.key.hex()
         )
 
-        headers = self.get_request_headers() | {
-            "X-Flashbots-Signature": f"{self.signature_account.address}:{signed_message.signature.hex()}"
-        }
+        # headers = self.get_request_headers() | {
+        #     "X-Flashbots-Signature": f"{self.signature_account.address}:{signed_message.signature.hex()}"
+        # }
+        headers = self.get_request_headers()
+        headers["X-Flashbots-Signature"] = f"{self.signature_account.address}:{signed_message.signature.hex()}"
 
         if ("goerli" in self.endpoint_uri) and (method == "eth_sendPrivateTransaction"):
             raise NotImplementedError(
